@@ -2,7 +2,27 @@ BroadMultiMeter
 ===============
 
 A Broad- & Multicast Meter to messure the amount of broadcast and
-multicast in the local network.
+multicast traffic in the local network.
 
-This might help to detect and analyze broadcast storms, caused by
+This might help to detect and to analyze broadcast storms, caused by
 loops and bad user configurations.
+
+
+Dependencies
+------------
+
+As this is written in haskell, ghc is needed.
+
+The pcap-haskell binding is needed as well, install it:
+
+sudo cabal update
+sudo cabal install pcap
+
+
+Run
+---
+
+So far I use this command. Root privileges are needed to access
+the raw network interface.
+
+sudo runhaskell BroadMultiMeter.hs
