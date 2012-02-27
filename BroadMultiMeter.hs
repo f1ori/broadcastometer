@@ -38,13 +38,24 @@ showMac :: B.ByteString -> String
 showMac mac = foldr1 (\x y->x++":"++y) (map (($"").showHex) (B.unpack mac))
 
 getTopThree list = take 3 $ sortBy (comparing (negate.snd)) list
+getSum stats = sum $ map snd $ Map.toList $ statsSrcMacs stats
+topSrcMacs stats = getTopThree $ Map.toList $ statsSrcMacs stats
+topDestMacs stats = getTopThree $ Map.toList $ statsDestMacs stats
 
 showStats :: Stats -> String
-showStats stats = "src-macs:\n" ++ (showTopMacs topSrcMacs) ++ "dest-macs:\n" ++ (showTopMacs topDestMacs)
+showStats stats = "packets:" ++ (show $ getSum stats) ++
+                  "\nsrc-macs:\n" ++ (showTopMacs $ topSrcMacs stats) ++
+		  "dest-macs:\n" ++ (showTopMacs $ topDestMacs stats)
     where
         showTopMacs macs = concat $ map (\(mac,count) -> (showMac mac) ++": "++(show count)++"\n") macs
-        topSrcMacs = getTopThree $ Map.toList $ statsSrcMacs stats
-        topDestMacs = getTopThree $ Map.toList $ statsDestMacs stats
+
+statsToJson :: Stats -> String
+statsToJson stats = "{ 'count': " ++ (show $ getSum stats) ++ ",\n" ++
+                    "'src': {" ++ (jsonMacs $ topSrcMacs stats) ++ "},\n" ++
+                    "'dest': {" ++ (jsonMacs $ topDestMacs stats) ++ "}\n" ++
+                    "}"
+    where
+        jsonMacs macs = intercalate ", " $ map (\(mac,count) -> "'"++(showMac mac)++ "': "++(show count)) macs
 
 process :: MVar Stats -> PktHdr -> B.ByteString -> IO ()
 process stats header buffer = do
@@ -57,6 +68,7 @@ process stats header buffer = do
     if lastupdate + interval < timestamp
         then do
 	    old_stats <- swapMVar stats (Stats Map.empty Map.empty timestamp)
+	    writeFile "stats.json" (statsToJson old_stats)
 	    putStrLn $ showStats old_stats
 	else return ()
 
