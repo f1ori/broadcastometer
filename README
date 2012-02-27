@@ -1,0 +1,8 @@
+BroadMultiMeter
+===============
+
+A Broad- & Multicast Meter to messure the amount of broadcast and
+multicast in the local network.
+
+This might help to detect and analyze broadcast storms, caused by
+loops and bad user configurations.
