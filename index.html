@@ -1,0 +1,137 @@
+<!doctype>
+<head>
+
+<link type="text/css" rel="stylesheet" href="libs/rickshaw/rickshaw.min.css">
+<script src="libs/d3/d3.min.js"></script>
+<script src="libs/d3/d3.layout.min.js"></script>
+<script src="libs/jquery-1.7.1.min.js"></script>
+<script src="libs/rickshaw/rickshaw.min.js"></script>
+
+
+<style>
+#chart_container {
+        position: relative;
+        font-family: Arial, Helvetica, sans-serif;
+}
+#chart {
+        position: relative;
+        left: 40px;
+}
+#y_axis {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+}
+</style>
+
+
+</head>
+
+
+<body>
+<h2>Broadcast-O-Meter</h2>
+
+<p>
+Messuring broadcast and multicast traffic (by counting packets)
+</p>
+
+<div id="chart_container">
+        <div id="y_axis"></div>
+        <div id="chart"></div>
+</div>
+
+<h4>TOP-3 Sender</h4>
+
+<table>
+<tr>
+<th>MAC</th>
+<th>Packets/3sec</th>
+</tr>
+<tr> <td id="src0mac"></td><td id="src0count"></td> </tr>
+<tr> <td id="src1mac"></td><td id="src1count"></td> </tr>
+<tr> <td id="src2mac"></td><td id="src2count"></td> </tr>
+</table>
+
+<h4>TOP-3 Destinations</h4>
+
+<table>
+<tr>
+<th>MAC</th>
+<th>Packets/3sec</th>
+</tr>
+<tr> <td id="dest0mac"></td><td id="dest0count"></td> </tr>
+<tr> <td id="dest1mac"></td><td id="dest1count"></td> </tr>
+<tr> <td id="dest2mac"></td><td id="dest2count"></td> </tr>
+</table>
+
+<script>
+
+historyNum = 50;
+seriesData = [];
+for(i=0; i<historyNum; i++) {
+    seriesData.push({x:i, y:0});
+}
+nextXIndex = 50;
+
+var graph = new Rickshaw.Graph( {
+        element: document.querySelector("#chart"),
+        width: 540,
+        height: 240,
+        renderer: 'bar',
+        series: [ {
+                data: seriesData,
+                color: 'steelblue',
+                name: '#broad-&multicast packets'
+        } ]
+} );
+
+//var x_axis = new Rickshaw.Graph.Axis.Time( { graph: graph } );
+
+var y_axis = new Rickshaw.Graph.Axis.Y( {
+        graph: graph,
+        orientation: 'left',
+        tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+        element: document.getElementById('y_axis'),
+} );
+
+graph.render();
+
+//var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+//    graph: graph
+//} );
+
+setInterval( function() {
+    if (0) {
+        // debug code producing random data
+        seriesData.push({x:nextXIndex, y:Math.random()*40});
+        nextXIndex++;
+        seriesData.shift();
+        graph.update();
+    } else {
+        $.getJSON('data.json', function(data) {
+            seriesData.push({x:nextXIndex, y: data.count});
+            nextXIndex++;
+            seriesData.shift();
+            graph.update();
+            for(i=0; i<3; i++) {
+                $('#src'+i+'mac').text("");
+                $('#src'+i+'count').text("");
+                if (data.src[i]) {
+                    $('#src'+i+'mac').text(data.src[i].mac);
+                    $('#src'+i+'count').text(data.src[i].count);
+                }
+                $('#dest'+i+'mac').text("");
+                $('#dest'+i+'count').text("");
+                if (data.dest[i]) {
+                    $('#dest'+i+'mac').text(data.dest[i].mac);
+                    $('#dest'+i+'count').text(data.dest[i].count);
+                }
+            }
+        });
+    }
+}, 3000 );
+
+
+</script>
+</body>
