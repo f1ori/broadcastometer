@@ -1,5 +1,6 @@
 --- |
---- | A Broad- & Multicast Meter
+--- | Broadcast-O-Meter
+--- | messuring broad- & multicast traffic
 --- |
 --- Copyright : (c) Florian Richter 2012
 --- License : MIT

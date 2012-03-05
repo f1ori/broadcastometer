@@ -1,7 +1,7 @@
-BroadMultiMeter
-===============
+Broadcast-O-Meter
+=================
 
-A Broad- & Multicast Meter to messure the amount of broadcast and multicast
+The Broadcast-O-Meter messures the amount of broadcast and multicast
 traffic in the local network.
 
 This might help to detect and to analyze broadcast storms, caused by loops and
