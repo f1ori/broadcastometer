@@ -1,11 +1,11 @@
 <!doctype>
 <head>
 
-<link type="text/css" rel="stylesheet" href="libs/rickshaw/rickshaw.min.css">
-<script src="libs/d3/d3.min.js"></script>
-<script src="libs/d3/d3.layout.min.js"></script>
-<script src="libs/jquery-1.7.1.min.js"></script>
-<script src="libs/rickshaw/rickshaw.min.js"></script>
+<link type="text/css" rel="stylesheet" href="lib/rickshaw/rickshaw.min.css">
+<script src="lib/d3/d3.min.js"></script>
+<script src="lib/d3/d3.layout.min.js"></script>
+<script src="lib/jquery-1.7.1.min.js"></script>
+<script src="lib/rickshaw/rickshaw.min.js"></script>
 
 
 <style>
@@ -110,22 +110,22 @@ setInterval( function() {
         graph.update();
     } else {
         $.getJSON('data.json', function(data) {
-            seriesData.push({x:nextXIndex, y: data.count});
+            seriesData.push({x:nextXIndex, y: data.packet_count});
             nextXIndex++;
             seriesData.shift();
             graph.update();
             for(i=0; i<3; i++) {
                 $('#src'+i+'mac').text("");
                 $('#src'+i+'count').text("");
-                if (data.src[i]) {
-                    $('#src'+i+'mac').text(data.src[i].mac);
-                    $('#src'+i+'count').text(data.src[i].count);
+                if (data.src_macs[i]) {
+                    $('#src'+i+'mac').text(data.src_macs[i].mac);
+                    $('#src'+i+'count').text(data.src_macs[i].packet_count);
                 }
                 $('#dest'+i+'mac').text("");
                 $('#dest'+i+'count').text("");
-                if (data.dest[i]) {
-                    $('#dest'+i+'mac').text(data.dest[i].mac);
-                    $('#dest'+i+'count').text(data.dest[i].count);
+                if (data.dest_macs[i]) {
+                    $('#dest'+i+'mac').text(data.dest_macs[i].mac);
+                    $('#dest'+i+'count').text(data.dest_macs[i].packet_count);
                 }
             }
         });
