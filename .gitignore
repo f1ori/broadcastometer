@@ -1,3 +1,9 @@
-libs/
+html/lib
+broadcastometer/lib
 data.json
 *~
+moc_*
+*.o
+broadcastometer/broadcastometer
+*.user
+Makefile
