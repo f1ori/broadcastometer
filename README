@@ -11,21 +11,16 @@ bad user configurations.
 Dependencies
 ------------
 
-As this is written in haskell, ghc is needed.
-
-The pcap-haskell binding is needed as well, install it:
-
-sudo cabal update
-sudo cabal install pcap
-
+* Qt
+* pcap
 
 Run
 ---
 
-So far I use this command. Root privileges are needed to access the raw network
-interface.
-
-sudo runhaskell BroadMultiMeter.hs
+qmake
+make
+cd broadcastometer
+sudo ./broadcastometer eth0 ../html/data.json
 
 
 License
