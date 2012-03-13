@@ -23,6 +23,7 @@
         bottom: 0;
         width: 40px;
 }
+
 </style>
 
 
@@ -40,6 +41,7 @@ Messuring broadcast and multicast traffic (by counting packets)
         <div id="y_axis"></div>
         <div id="chart"></div>
 </div>
+
 
 <h4>TOP-3 Sender</h4>
 
@@ -67,26 +69,32 @@ Messuring broadcast and multicast traffic (by counting packets)
 
 <script>
 
-historyNum = 50;
-seriesData = [];
-for(i=0; i<historyNum; i++) {
-    seriesData.push({x:i, y:0});
-}
+var palette = new Rickshaw.Color.Palette();
+
+historyNum = 50; // length of history
 nextXIndex = 50;
+seriesData = [];
+// fill history with zeros
+function create_serie(name) {
+    newSerie = {
+                data: [],
+                name: name,
+                color: palette.color()
+        };
+    for(i=nextXIndex-historyNum; i<nextXIndex-1; i++) {
+        newSerie.data.push({x:i, y:0});
+    }
+    seriesData.push(newSerie);
+}
+create_serie('other');
+seriesData[0].data.push({x:nextXIndex, y:0});
 
 var graph = new Rickshaw.Graph( {
         element: document.querySelector("#chart"),
         width: 540,
         height: 240,
         renderer: 'bar',
-        series: [ {
-                data: seriesData,
-                color: 'steelblue',
-                name: '#broad-&multicast packets'
-        } ]
-} );
-
-//var x_axis = new Rickshaw.Graph.Axis.Time( { graph: graph } );
+        series: seriesData} );
 
 var y_axis = new Rickshaw.Graph.Axis.Y( {
         graph: graph,
@@ -97,23 +105,47 @@ var y_axis = new Rickshaw.Graph.Axis.Y( {
 
 graph.render();
 
-//var hoverDetail = new Rickshaw.Graph.HoverDetail( {
-//    graph: graph
-//} );
+
+var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+    graph: graph
+} );
 
 setInterval( function() {
     if (0) {
         // debug code producing random data
-        seriesData.push({x:nextXIndex, y:Math.random()*40});
+        seriesData[0].data.push({x:nextXIndex, y:Math.random()*40});
         nextXIndex++;
         seriesData.shift();
         graph.update();
     } else {
         $.getJSON('data.json', function(data) {
-            seriesData.push({x:nextXIndex, y: data.packet_count});
+            // update graph
+            next_type:
+            for (type in data.types) {
+                for(i=0; i<seriesData.length; i++) {
+                   if (seriesData[i].name == type) {
+                       seriesData[i].data.push({x:nextXIndex, y: data.types[type].packet_count});
+                       break next_type;
+                   }
+                }
+                // type in series not found, create it
+                create_serie(type);
+                seriesData[seriesData.length-1].data.push({x:nextXIndex, y: data.types[type].packet_count});
+            }
+            // fill the rest
+            for(i=0; i<seriesData.length; i++) {
+               var serieData = seriesData[i].data;
+               if (serieData[serieData.length-1].x != nextXIndex) {
+                   seriesData[i].data.push({x:nextXIndex, y: 0});
+               }
+            }
             nextXIndex++;
-            seriesData.shift();
+            // remove oldest entry from history
+            for(i=0; i<seriesData.length; i++)
+                seriesData[i].data.shift();
+            // TODO: clean empty types!?
             graph.update();
+            // update mac stats
             for(i=0; i<3; i++) {
                 $('#src'+i+'mac').text("");
                 $('#src'+i+'count').text("");

@@ -107,13 +107,20 @@ void analizePacket(const uchar * packet, QString& type, QString& src_mac, QStrin
 	        type = "DHCP";
 		return;
 	    case 137:
+	    case 138:
 	        type = "NetBIOS";
+		return;
+	    case 631:
+	        type = "Printer";
 		return;
 	    case 1900:
 	        type = "UPnP";
 		return;
 	    case 5353:
 	        type = "mDNS";
+		return;
+	    case 6646:
+	        type = "McAfee";
 		return;
 	    case 17500:
 	        type = "Dropbox";
